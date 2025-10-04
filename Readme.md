@@ -215,11 +215,3 @@ Built with ❤️ for students who want to study smarter, not harder.
 ```
 
 ---
-
-Would you like me to:
-
-- 💾 Export this as a downloadable `.md` file?  
-- 🧱 Create a base project structure with this README + files?
-
-Let me know and I’ll generate it instantly.
-```
