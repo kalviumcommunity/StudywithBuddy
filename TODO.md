@@ -1,0 +1,2 @@
+- [x] Update import in aiController.js to use callGemini from gemini.js instead of getGeminiResponse from openai.js
+- [x] Replace all calls to getGeminiResponse with callGemini in aiController.js

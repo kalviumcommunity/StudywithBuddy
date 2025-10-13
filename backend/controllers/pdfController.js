@@ -59,7 +59,7 @@ exports.uploadPDF = async (req, res) => {
   }
 };
 
-const { getGeminiResponse } = require('../utils/openai');
+const { callGemini } = require('../utils/gemini');
 const prompts = require('../utils/prompts');
 
 // Ask question from PDF using AI with context
@@ -77,7 +77,7 @@ exports.askFromPDF = async (req, res) => {
     // Prepare prompt with PDF content and question
     const systemPrompt = prompts.PDF_QA.replace('{pdf_content}', doc.content).replace('{question}', question);
     // Get AI answer
-    const answer = await getGeminiResponse(systemPrompt, '');
+    const answer = await callGemini(systemPrompt, '');
     res.json({
       answer: answer.trim(),
       sources: [doc.filename]

@@ -5,8 +5,8 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 // Use the correct Gemini model and endpoint for v1beta API
 // Updated to use the current available model instead of deprecated gemini-pro
-const GEMINI_MODEL = 'models/gemini-1.5-flash';
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/${GEMINI_MODEL}:generateContent`;
+const GEMINI_MODEL = 'gemini-2.0-flash';
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 async function callGemini(systemPrompt, userPrompt) {
   try {

@@ -1,14 +1,18 @@
 // AI Controller: Handles doubt-solving, study plan, flashcards, quiz
-const { getGeminiResponse } = require('../utils/openai');
+const { callGemini } = require('../utils/gemini');
 const prompts = require('../utils/prompts');
 
 // Doubt-solving
 exports.solveDoubt = async (req, res) => {
   const { question, subject } = req.body;
   try {
-    const answer = await getGeminiResponse(prompts.DOUBT_SOLVER, `Subject: ${subject}\nQuestion: ${question}`);
+    const answer = await callGemini(prompts.DOUBT_SOLVER, `Subject: ${subject}\nQuestion: ${question}`);
     res.json({ answer });
   } catch (err) {
+    // Log full error with response body when available
+    console.error('Gemini error in solveDoubt:', err);
+    if (err.response && err.response.data) console.error('Gemini response body:', err.response.data);
+    // include only the message in the response; if we attached extra details upstream, include them
     res.status(500).json({ error: 'Gemini error', details: err.message });
   }
 };
@@ -17,7 +21,7 @@ exports.solveDoubt = async (req, res) => {
 exports.studyPlan = async (req, res) => {
   const { subject, days } = req.body;
   try {
-    const planText = await getGeminiResponse(prompts.STUDY_PLANNER, `Subject: ${subject}\nDays: ${days}`);
+    const planText = await callGemini(prompts.STUDY_PLANNER, `Subject: ${subject}\nDays: ${days}`);
     // Robustly extract JSON array/object from code block if present
     function extractJsonFromCodeBlock(text) {
       let cleaned = text
@@ -41,6 +45,7 @@ exports.studyPlan = async (req, res) => {
     }
     res.json({ plan });
   } catch (err) {
+    console.error('Gemini error in studyPlan:', err);
     res.status(500).json({ error: 'Gemini error', details: err.message });
   }
 };
@@ -52,7 +57,7 @@ exports.flashcards = async (req, res) => {
   try {
     console.log('Flashcards endpoint hit');
     console.log('Request body:', req.body);
-    const flashcardsText = await getGeminiResponse(prompts.FLASHCARD_GENERATOR, `Create ${count} flashcards for topic: ${topic}`);
+    const flashcardsText = await callGemini(prompts.FLASHCARD_GENERATOR, `Create ${count} flashcards for topic: ${topic}`);
     console.log('Gemini flashcardsText:', flashcardsText);
     let flashcards;
     // Robustly extract JSON array from code block if present
@@ -97,7 +102,7 @@ exports.flashcards = async (req, res) => {
     console.log('Parsed flashcards:', flashcards);
     res.json({ flashcards });
   } catch (err) {
-    console.error('Gemini error:', err);
+    console.error('Gemini error in flashcards:', err);
     res.status(500).json({ error: 'Gemini error', details: err.message });
   }
 };
@@ -107,7 +112,7 @@ exports.quiz = async (req, res) => {
   const topic = req.body.topic || req.body.text;
   const count = req.body.count || 5;
   try {
-    const quizText = await getGeminiResponse(prompts.QUIZ_GENERATOR, `Create ${count} MCQs for topic: ${topic}`);
+    const quizText = await callGemini(prompts.QUIZ_GENERATOR, `Create ${count} MCQs for topic: ${topic}`);
     // Robustly extract JSON array/object from code block if present
     function extractJsonFromCodeBlock(text) {
       let cleaned = text
@@ -131,6 +136,7 @@ exports.quiz = async (req, res) => {
     }
     res.json({ quiz });
   } catch (err) {
+    console.error('Gemini error in quiz:', err);
     res.status(500).json({ error: 'Gemini error', details: err.message });
   }
 };
